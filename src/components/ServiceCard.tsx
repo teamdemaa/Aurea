@@ -1,0 +1,69 @@
+import Link from "next/link";
+import type { Tool } from "@/lib/types";
+import * as Icons from "lucide-react";
+import type { ComponentType } from "react";
+
+export default function ServiceCard({ 
+  service, 
+  fullWidth = false,
+  baseUrl = "/services",
+  hidePrice = false
+}: { 
+  service: Tool, 
+  fullWidth?: boolean,
+  baseUrl?: string,
+  hidePrice?: boolean
+}) {
+  const iconMap = Icons as unknown as Record<string, ComponentType<{ className?: string }>>;
+  const IconComponent = iconMap[service.icon] || Icons.Box;
+
+  const widthClasses = fullWidth 
+    ? "w-full" 
+    : "flex-none w-[85vw] md:w-[calc(50%-0.75rem)] lg:w-[calc(25%-1rem)] snap-always snap-center md:snap-start";
+
+  const isService = baseUrl === "/services" || baseUrl === "/bons-plans";
+  
+  return (
+    <Link href={`${baseUrl}/${service.slug}`} className={`block group ${widthClasses}`}>
+      <div className="w-full h-full bg-white rounded-2xl border border-gray-100 p-5 flex flex-col justify-between shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-300 transform group-hover:-translate-y-1 overflow-hidden relative">
+        {/* Glow effect on hover */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-brand-coral/5 rounded-full blur-2xl -mt-8 -mr-8 transition-opacity opacity-0 group-hover:opacity-100"></div>
+
+        {/* Improved Trust Badge for Services */}
+        {isService && (
+          <div className="absolute top-5 right-5 flex items-center space-x-1.5 px-3 py-1 bg-brand-coral/5 rounded-full animate-in fade-in zoom-in duration-500">
+             <Icons.ShieldCheck className="w-3 h-3 text-brand-coral/50 mb-0.5" />
+             <span className="text-[10px] font-normal text-brand-coral/70 tracking-tight whitespace-nowrap">
+               Approuvé par Demaa
+             </span>
+          </div>
+        )}
+
+        <div>
+          <div className="w-11 h-11 rounded-xl bg-gray-50 flex items-center justify-center mb-4 group-hover:bg-brand-coral/10 transition-colors">
+            <IconComponent className="w-5 h-5 text-brand-blue group-hover:text-brand-coral transition-colors" />
+          </div>
+          <h3 className="text-lg font-bold text-brand-blue group-hover:text-brand-coral transition-colors leading-tight mb-2">
+            {service.name}
+          </h3>
+          <p className="text-gray-500 text-sm line-clamp-2 leading-relaxed mb-3 mt-4">
+            {service.description}
+          </p>
+          {service.price && !hidePrice && (
+            <p className={`mt-3 ${service.price.toLowerCase().includes('gratuit') 
+              ? "text-[10px] uppercase tracking-[0.1em] text-gray-300 font-medium" 
+              : "text-xs font-bold text-brand-blue/60"}`}>
+              {service.price}
+            </p>
+          )}
+        </div>
+
+        <div className="flex flex-wrap gap-2 mt-4">
+          <span className="px-3 py-1 bg-brand-blue/5 text-brand-blue/60 text-[11px] font-medium tracking-wide rounded-full">
+            {service.category}
+          </span>
+        </div>
+      </div>
+    </Link>
+  );
+}
